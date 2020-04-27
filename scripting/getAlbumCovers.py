@@ -2,6 +2,7 @@ import requests
 import json
 from Levenshtein import distance as levenshtein_distance
 import urllib.request
+import os.path
 
 API_KEY = open('../apis/lastfm.key').read().strip()
 USER_AGENT = 'Dataquest'
@@ -36,14 +37,11 @@ def getClosestGuess(artist, albumName):
     pos = -1
 
     for i in range(len(albums)):
-        lev = levenshtein_distance(artist, albums[i]['artist'])
+        lev = levenshtein_distance(artist.lower(), albums[i]['artist'].lower())
         if lev < dist:
             dist = lev
             pos = i
     
-    print(albums[pos]['image'][-1]['#text'])
-    print (albums[pos]['name'])
-    print (albums[pos]['artist'])
     return albums[pos]['image'][-1]['#text']
 
 
@@ -54,16 +52,19 @@ def downloadImage (url, imageName):
     except:
         print("COULDNT FIND PIC: " + imageName)
 
+# TODO: check existence before making any req
 
 def processAlbum (artist, albumName):
     imageUrl = getClosestGuess(artist, albumName)
     cArtist = artist.replace(" ","")
-    cArtist = artist.replace("|","_")
+    cArtist = cArtist.replace("|","_")
     cAlbumName = albumName.replace(" ","")
     fileName = "../images/albums/" + cArtist + "-" + cAlbumName + ".jpg"
-    print(fileName)
-    downloadImage(imageUrl, fileName)
-
+    print(artist, albumName, fileName)
+    if os.path.isfile(fileName):
+        print('ALREDY EXISTS')
+    else:
+        downloadImage(imageUrl, fileName)
 
 def getAllAlbums():
     albums = []
