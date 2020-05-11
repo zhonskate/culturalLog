@@ -41,8 +41,10 @@ def getClosestGuess(artist, albumName):
         if lev < dist:
             dist = lev
             pos = i
-
-    return albums[pos]["image"][-1]["#text"]
+    try:
+        return albums[pos]["image"][-1]["#text"]
+    except:
+        print("ENTRY NOT FOUND " + albumName)
 
 def downloadImage(url, imageName):
     try:
